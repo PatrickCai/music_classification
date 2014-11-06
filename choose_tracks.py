@@ -36,7 +36,7 @@ for top_track in top_tracks:
 
 random.shuffle(selected_tracks)
 
-selected_tracks = selected_tracks[:400]
+selected_tracks = selected_tracks[:800]
 
 cPickle.dump(selected_tracks, open("top_tracks", "w"))
 
