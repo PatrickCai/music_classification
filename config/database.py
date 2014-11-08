@@ -1,4 +1,5 @@
 import constants
+import random
 
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Enum
@@ -44,7 +45,7 @@ def store_tag(artist, title, tag, value):
 	track_id = req_track.id 
 	tag_instance = Tag(track_id=track_id, tag_type=tag, tag_value=value)
 	session.add(tag_instance)
-	req_track.test = constants.DATA_TRAINING
+	req_track.test = constants.DATA_NOT_USED
 	session.commit()
 
 def store_track(username, artist, title):
@@ -55,13 +56,36 @@ def store_track(username, artist, title):
 
 def fetch_track():
 	session = _get_session()
-	req_track = session.query(Track).filter(Track.test==constants.DATA_TRAINING).filter(Track.music_type!=None).all()
-	return req_track
+	req_tracks = session.query(Track).filter(Track.test==constants.DATA_NOT_USED).filter(Track.music_type!=None).all()
+	random.shuffle(req_tracks)
+	train_number = int(len(req_tracks) * constants.TRAIN_TEST_RATIO)
+	req_tracks = req_tracks[0: train_number]
+	for req_track in req_tracks:
+		req_track.test = constants.DATA_TRAINING
+		session.commit()
+	return req_tracks
+
+def fetch_test_tracks():
+	'''Get the tracks for testing'''
+	session = _get_session()
+	req_tracks = session.query(Track).filter(Track.test==constants.DATA_NOT_USED).filter(Track.music_type!=None).all()
+	# for req_track in req_tracks:
+	# 	req_track.test = constants.DATA_TEST
+	# 	session.commit()
+	return req_tracks
 
 def fetch_tags():
 	session = _get_session()
 	tags_info = session.query(Tag).all()
 	return tags_info
+
+def restore_track_status():
+	'''Restore the track status into NOT USED, if the track is labled with the music type'''
+	session = _get_session()
+	req_tracks = session.query(Track).filter(Track.music_type!=None).all()
+	for req_track in req_tracks:
+		req_track.test = constants.DATA_NOT_USED
+		session.commit()
 
 def fetch_one_track(track_id):
 	session = _get_session()
@@ -71,4 +95,6 @@ def fetch_one_track(track_id):
 if __name__ == "__main__":
 	# store_track('d', 'd', 'd')
 	# store_tag('Destroyer','Kaputt','ele',1)
-	fetch_track()
+	# fetch_track()
+	restore_track_status()
+	# pass
