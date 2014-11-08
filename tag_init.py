@@ -23,10 +23,12 @@ def get_tags(track):
 	tags = track[1]
 	for tag in tags:
 		if str(tag[0]) in constants.VALID_TAGS:
-			if int(tag[1]) < constants.MIDDLE_VALUE:
+			if int(tag[1]) < constants.MIDDLE_VALUE and int(tag[1]) > constants.LOWEST_VALUE:
 				value = 1
-			else :
+			elif int(tag[1]) > constants.MIDDLE_VALUE :
 				value = 2
+			else:
+				break
 			artist = str(track[0][0])
 			title = str(track[0][1])
 			tag = str(tag[0])
