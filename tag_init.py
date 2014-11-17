@@ -23,9 +23,9 @@ def get_tags(track):
 	tags = track[1]
 	for tag in tags:
 		if str(tag[0]) in constants.VALID_TAGS:
-			if int(tag[1]) < constants.MIDDLE_VALUE and int(tag[1]) > constants.LOWEST_VALUE:
+			if int(tag[1]) < constants.MIDDLE_VALUE:
 				value = 1
-			elif int(tag[1]) > constants.MIDDLE_VALUE :
+			elif int(tag[1]) >= constants.MIDDLE_VALUE :
 				value = 2
 			else:
 				break
@@ -34,7 +34,7 @@ def get_tags(track):
 			tag = str(tag[0])
 			database.store_tag(artist, title, tag, value)
 
-
+ 
 def download_tags(track):
 	tags = track[0].get_top_tags()
 	tag = [(track[0].artist, track[0].title), tags]

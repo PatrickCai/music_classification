@@ -3,6 +3,9 @@
 
 import sys
 import cPickle
+import time
+
+from decimal import Decimal
 
 from config import database, constants
 
@@ -16,6 +19,7 @@ def fetch_track_info():
 	for emotion in constants.EMOTIONS:
 		emotion_tracks = [track.id for track in req_tracks if track.music_type==emotion]
 		tracks_classification[emotion] = emotion_tracks
+	print(tracks_number)
 	return tracks_classification,tracks_number
 
 def bl(number):
@@ -55,7 +59,7 @@ def _calculate_tags_percentage(track_ids, track_tags):
 	#从个数到计算频率
 	tags_percentage = {}
 	for emotion, values in tags_count.iteritems():
-		tags_percentage[emotion] = [float(bl(value)/len(track_ids)) for value in values]
+		tags_percentage[emotion] = [Decimal(bl(value)/len(track_ids)) for value in values]
 	return tags_percentage
 
 def calculate_probability(tracks_tags, emotion_in_axis):
@@ -63,17 +67,16 @@ def calculate_probability(tracks_tags, emotion_in_axis):
 	for emotion, track_ids in emotion_in_axis.iteritems():
 		tags_percentage = _calculate_tags_percentage(track_ids, tracks_tags)
 		axis_type[emotion] = tags_percentage
-	print(axis_type)
 	return axis_type
 
 def get_types_percentage(emotion_in_axis, tracks_number):
 	axis_percentage = {}
 	for emotion, tracks in emotion_in_axis.iteritems():
-		axis_percentage[emotion] = float(bl(len(tracks))/tracks_number)
-	print(axis_percentage)
+		axis_percentage[emotion] = Decimal(bl(len(tracks))/tracks_number)
 	return axis_percentage
 
 if __name__ == "__main__":
+	# time.sleep(6)
 	tracks_classification,tracks_number = fetch_track_info()
 	emotion_in_x_axis = classify_axis_emotion("x", tracks_classification)
 	emotion_in_y_axis = classify_axis_emotion("y", tracks_classification)

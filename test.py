@@ -3,7 +3,8 @@
 
 import sys
 import cPickle
-
+import time
+from decimal import Decimal
 from config import database,constants
 
 reload(sys)
@@ -20,7 +21,7 @@ def _to_percentage(emotion_result):
 	total = sum(emotion_result.values())
 	results = {}
 	for emotion, value in emotion_result.iteritems():
-		results[emotion] = float(value/total)
+		results[emotion] = Decimal(value/total)
 	return results
 
 def test_one_track(track_id, axis):
@@ -51,32 +52,30 @@ def test_one_track(track_id, axis):
 		emotion_result[emotion] = result
 	emotion_result = _to_percentage(emotion_result)
 	# {"High": 0.2, "up" : 0.6, "down": 0.1, "low": 0.3}
-	print(emotion_result)
 	return emotion_result
 
 def calculate_success_percentage(track, emotion_result, axis, success_count):
 	music_type = track.music_type
 	emotion = sorted(emotion_result.items(), key=lambda x:x[1], reverse=True)[0][0]
-	print("The track is %s - %s"%(track.artist, track.title))
-	
-	print("The music type is %s"%(music_type))
-	print("The x emotion is %s"%(emotion))
 	if axis == "x":
 		music_types = constants.X_AXIS_EMOTIONS[emotion]
 	elif axis == "y":
 		music_types = constants.Y_AXIS_EMOTIONS[emotion]
 
 	if music_type in music_types:
-		print("RIGHT!")
 		success_count += 1
-		print(success_count)
 	else:
-		print("WRONG!")
-	print("*******************")
+		print(emotion_result)
+		print("The track is %s - %s"%(track.artist, track.title))
+		print("The track id is %s"%(track.id))
+		print(u"试听的情感 %s"%(music_type))
+		print(u"机器学习结果是%s"%(emotion))
+		print("*******************")
 	return success_count
 
 if __name__ == "__main__":
-	tracks = database.fetch_test_tracks()
+	# time.sleep(15)
+	tracks = database.fetch_test_tracks() 
 	success_count = 0
 	for track in tracks:
 		x_emotion_result = test_one_track(track.id, "x")

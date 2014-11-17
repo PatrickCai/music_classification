@@ -57,6 +57,7 @@ def store_track(username, artist, title):
 def fetch_track():
 	session = _get_session()
 	req_tracks = session.query(Track).filter(Track.test==constants.DATA_NOT_USED).filter(Track.music_type!=None).all()
+	print("the length of the request tracks%s"%len(req_tracks))
 	random.shuffle(req_tracks)
 	train_number = int(len(req_tracks) * constants.TRAIN_TEST_RATIO)
 	req_tracks = req_tracks[0: train_number]
@@ -83,7 +84,7 @@ def restore_track_status():
 	'''Restore the track status into NOT USED, if the track is labled with the music type'''
 	session = _get_session()
 	req_tracks = session.query(Track).filter(Track.music_type!=None).all()
-	for req_track in req_tracks:
+	for req_track in req_tracks :
 		req_track.test = constants.DATA_NOT_USED
 		session.commit()
 
