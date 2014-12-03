@@ -8,11 +8,9 @@ from config import pylast, constants
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
-
 MAX_ARTIST_FREQUENCY = 4
 
-network = pylast.LastFMNetwork(api_key = constants.API_KEY, api_secret = 
+network = pylast.LastFMNetwork(api_key=constants.API_KEY, api_secret=
     constants.API_SECRET)
 username = "patrickcai"
 user = pylast.User(username, network)
