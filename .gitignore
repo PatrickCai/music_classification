@@ -1,6 +1,8 @@
 *.pyc
 *.todo
-per_x
-per_y
 type_x
 type_y
+per_x
+per_y
+.tags
+.tags_sorted_by_file

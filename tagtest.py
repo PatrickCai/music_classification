@@ -1,6 +1,8 @@
-import pylast
 import random
 import cPickle
+
+from config import pylast
+
 API_KEY = "2e6e98ec329aa9c86bb8a541fc09bd29" # this is a sample key
 API_SECRET = "c86c14938f3344707b0a56a0a1370e69"
 network = pylast.LastFMNetwork(api_key = API_KEY, api_secret = 
