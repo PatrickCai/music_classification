@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 # -- encoding:utf - 8 --
 import cPickle
-from config import constants, pylast, database
 import sys
+
+from credis import credis
+from config import constants, pylast
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -21,10 +23,13 @@ def set_tracks():
         print("Invalid user")
         exit()
     tracks = cPickle.load(open("top_tracks", "r"))
+    redis_tracks = []
     for track in tracks:
         artist = unicode(track[0].artist)
         title = unicode(track[0].title)
-        database.store_track(username, artist, title)
+        redis_track = (artist, title)
+        redis_tracks.append(redis_track)
+    credis.store_tracks(redis_tracks)
 
 if __name__ == "__main__":
     set_tracks()
