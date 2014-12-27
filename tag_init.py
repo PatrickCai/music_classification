@@ -9,6 +9,7 @@ monkey.patch_all()
 
 from config import constants, database
 from credis import credis
+from credis.credis import Credis
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -37,28 +38,37 @@ def get_tags(track):
             database.store_tag(artist, title, tag, value)
 
 
-def init_all_tracks():
+def init_all_tracks(client):
     '''Put all tracks info into redis
     '''
     tracks = cPickle.load(open("top_tracks", "r"))
     for track in tracks:
         artist = unicode(track[0].artist)
         title = unicode(track[0].title)
-        credis.init_track((artist, title))
+        client.init_track((artist, title))
 
 
-def download_tags(track):
+def download_tags(track, client):
     tags = track[0].get_top_tags()
     tag = [(track[0].artist, track[0].title), tags]
     all_tags.append(tag)
     print(len(all_tags))
     cPickle.dump(all_tags, open('tags', 'a'))
+    client.remove_from_uncrawled(track)
     if len(all_tags) >= 80:
         exit(0)
 
 
+def is_in_uncrawled(track):
+    return credis.is_in_uncrawled(track)
+
+
 if __name__ == "__main__":
-    gevent_spawns = [gevent.spawn(download_tags, track) for track in tracks]
+    client = Credis()
+    # init_all_tracks(client)
+    gevent_spawns = [gevent.spawn(download_tags, track, client)
+                     for track in tracks
+                     if client.is_in_uncrawled(track)]
     gevent.joinall(gevent_spawns)
     print(all_tags)
 
