@@ -5,20 +5,24 @@ import cPickle
 import gevent
 
 from gevent import monkey
+from gevent.coros import BoundedSemaphore
 monkey.patch_all()
 
 from config import constants, database
 from credis import credis
+from credis.credis import Credis
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 tracks = cPickle.load(open("top_tracks", "r"))
 
-# tracks = tracks[81:82]
+# tracks = tracks[180:280]
 
 tag_value = []
 
 all_tags = []  # each element [(artist, title), tags]
+
+sem = BoundedSemaphore(1)
 
 
 def get_tags(track):
@@ -37,30 +41,37 @@ def get_tags(track):
             database.store_tag(artist, title, tag, value)
 
 
-def init_all_tracks():
+def init_all_tracks(client):
     '''Put all tracks info into redis
     '''
     tracks = cPickle.load(open("top_tracks", "r"))
     for track in tracks:
         artist = unicode(track[0].artist)
         title = unicode(track[0].title)
-        credis.init_track((artist, title))
+        client.init_track((artist, title))
 
 
-def download_tags(track):
+def download_tags(track, client):
     tags = track[0].get_top_tags()
     tag = [(track[0].artist, track[0].title), tags]
     all_tags.append(tag)
+    cPickle.dump(all_tags, open('tags', 'w'))
+    client.remove_from_uncrawled(track)
     print(len(all_tags))
-    cPickle.dump(all_tags, open('tags', 'a'))
-    if len(all_tags) >= 80:
-        exit(0)
+
+
+def is_in_uncrawled(track):
+    return credis.is_in_uncrawled(track)
 
 
 if __name__ == "__main__":
-    gevent_spawns = [gevent.spawn(download_tags, track) for track in tracks]
+    client = Credis()
+    # init_all_tracks(client)
+    gevent_spawns = [gevent.spawn(download_tags, track, client)
+                     for track in tracks
+                     if client.is_in_uncrawled(track)]
     gevent.joinall(gevent_spawns)
-    print(all_tags)
+    # print(all_tags)
 
     # tracks = cPickle.load(open('tags', 'r'))
     # for track in tracks:
