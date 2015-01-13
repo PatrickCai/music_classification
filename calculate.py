@@ -85,7 +85,6 @@ def get_types_percentage(emotion_in_axis, tracks_number):
     return axis_percentage
 
 if __name__ == "__main__":
-    # time.sleep(6)
     tracks_classification, tracks_number = fetch_track_info()
     emotion_in_x_axis = classify_axis_emotion("x", tracks_classification)
     emotion_in_y_axis = classify_axis_emotion("y", tracks_classification)
@@ -100,6 +99,7 @@ if __name__ == "__main__":
     x_axis_type = calculate_probability(tracks_tags, emotion_in_x_axis)
     y_axis_type = calculate_probability(tracks_tags, emotion_in_y_axis)
 
+    print(x_axis_percentage)
     cPickle.dump(x_axis_percentage, open("per_x", "w"))
     cPickle.dump(y_axis_percentage, open("per_y", "w"))
     cPickle.dump(x_axis_type, open("type_x", "w"))
