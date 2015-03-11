@@ -21,7 +21,6 @@ def fetch_track_info():
         emotion_tracks = [track.id for track in req_tracks
                           if track.music_type == emotion]
         tracks_classification[emotion] = emotion_tracks
-    print(tracks_number)
     return tracks_classification, tracks_number
 
 
@@ -58,14 +57,14 @@ def _calculate_tags_percentage(track_ids, track_tags):
             tag_index = tag[1]
             one_tag[tag_index] += 1  # 'summer': [3, 4, 1]
             value_tags.append(tag[0])
-        #对于没有给出标签(也就是标签值为0)的tag
+        # 对于没有给出标签(也就是标签值为0)的tag
         remaining_tags = list(set(constants.VALID_TAGS) - set(value_tags))
         for remaining_tag in remaining_tags:
             tags_count[remaining_tag][0] += 1
-    #从个数到计算频率
+    # 从个数到计算频率
     tags_percentage = {}
     for emotion, values in tags_count.iteritems():
-        tags_percentage[emotion] = [Decimal(bl(value) / len(track_ids))
+        tags_percentage[emotion] = [Decimal(str(bl(value) / len(track_ids)))
                                     for value in values]
     return tags_percentage
 
@@ -81,7 +80,7 @@ def calculate_probability(tracks_tags, emotion_in_axis):
 def get_types_percentage(emotion_in_axis, tracks_number):
     axis_percentage = {}
     for emotion, tracks in emotion_in_axis.iteritems():
-        axis_percentage[emotion] = Decimal(bl(len(tracks)) / tracks_number)
+        axis_percentage[emotion] = Decimal(str(bl(len(tracks)) / tracks_number))
     return axis_percentage
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ def _to_percentage(emotion_result):
     total = sum(emotion_result.values())
     results = {}
     for emotion, value in emotion_result.iteritems():
-        results[emotion] = Decimal(value / total)
+        results[emotion] = Decimal(str(value)) / Decimal(str(total))
     return results
 
 
@@ -65,15 +65,24 @@ def calculate_success_percentage(track, emotion_result, axis, success_count):
     elif axis == "y":
         music_types = constants.Y_AXIS_EMOTIONS[emotion]
 
-    if music_type in music_types:
-        success_count += 1
-    else:
+    if 1 == 1:
         print(emotion_result)
         print("The track is %s - %s" % (track.artist, track.title))
         print("The track id is %s" % (track.id))
         print(u"试听的情感 %s" % (music_type))
         print(u"机器学习结果是 %s" % (emotion))
         print("*******************")
+
+    if music_type in music_types:
+        success_count += 1
+    else:
+        pass
+        # print(emotion_result)
+        # print("The track is %s - %s" % (track.artist, track.title))
+        # print("The track id is %s" % (track.id))
+        # print(u"试听的情感 %s" % (music_type))
+        # print(u"机器学习结果是 %s" % (emotion))
+        # print("*******************")
     return success_count
 
 
@@ -82,13 +91,13 @@ if __name__ == "__main__":
     tracks = database.fetch_test_tracks()
     success_count = 0
     for track in tracks:
-        x_emotion_result = test_one_track(track.id, "x")
-        success_count = calculate_success_percentage(
-            track, x_emotion_result,
-            "x", success_count)
+        # x_emotion_result = test_one_track(track.id, "x")
+        # success_count = calculate_success_percentage(
+        #     track, x_emotion_result,
+        #     "x", success_count)
 
-        # y_emotion_result = test_one_track(track.id, "y")
-        # success_count = calculate_success_percentage(track,
-        #   y_emotion_result, "y", success_count)
-    print(len(tracks))
+        y_emotion_result = test_one_track(track.id, "y")
+        success_count = calculate_success_percentage(track,
+                                                     y_emotion_result,
+                                                     "y", success_count)
     print("The success percentage is %s" % (100 * success_count / len(tracks)))
